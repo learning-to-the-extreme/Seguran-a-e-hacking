@@ -36,18 +36,12 @@ cd modules
 touch test.py
 
 //Open up your favorite code/text editor and let's get started.
-# You can use 3rd party imports too, but PyInstaller might not like it
 import colorama
 from colorama.Fore import GREEN
 from colorama.Style import RESET_ALL
-# Each module must have a steal method for it to be valid
-# The steal method returns a string,which will then be written either
-# on the screen or in a file
 def steal():
 	colorama.init()
     	return print_it()
-# It can have other methods too,passthief doesn't care
-# All it cares about is the steal method
 def print_it():
 	return "{g}This works!{rs}".format(g=GREEN,rs=RESET_ALL)
 
