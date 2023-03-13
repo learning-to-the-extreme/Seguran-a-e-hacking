@@ -569,7 +569,7 @@ Usage: habu.data.filter [OPTIONS] FIELD [gt|lt|eq|ne|ge|le|in|contains|defin
           "net": "8.8.8.0/24",
           "cc": "US",
           "rir": "ARIN",
-          "asname":  "GOOGLE - Google LLC, US"
+          "asname": "GOOGLE - Google LLC, US"
       }
   ]
 
@@ -580,3 +580,439 @@ Options:
   -v           Verbose output
   --not        Negate the comparison
   --help       Show this message and exit.
+
+
+//habu.data.select
+Usage: habu.data.select [OPTIONS] FIELD
+
+  Select a field from a JSON input.
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.data.extract.ipv4 | habu.data.enrich | habu.data.filter cc eq US | habu.data.select asset
+  8.8.8.7
+  8.8.8.8
+  8.8.8.9
+
+Options:
+  -i FILENAME  Input file (Default: stdin)
+  -v           Verbose output
+  --json       JSON output
+  --help       Show this message and exit.
+
+
+//habu.dhcp.discover
+Usage: habu.dhcp.discover [OPTIONS]
+
+  Send a DHCP request and show what devices has replied.
+
+  Note: Using '-v' you can see all the options (like DNS servers) included
+  on the responses.
+
+  # habu.dhcp_discover
+  Ether / IP / UDP 192.168.0.1:bootps > 192.168.0.5:bootpc / BOOTP / DHCP
+
+Options:
+  -i TEXT     Interface to use
+  -t INTEGER  Time (seconds) to wait for responses
+  -v          Verbose output
+  --help      Show this message and exit.
+
+
+//habu.dhcp.starvation
+Usage: habu.dhcp.starvation [OPTIONS]
+
+  Send multiple DHCP requests from forged MAC addresses to fill the DHCP
+  server leases.
+
+  When all the available network addresses are assigned, the DHCP server
+  don't send responses.
+
+  So, some attacks, like DHCP spoofing, can be made.
+
+  # habu.dhcp_starvation
+  Ether / IP / UDP 192.168.0.1:bootps > 192.168.0.6:bootpc / BOOTP / DHCP
+  Ether / IP / UDP 192.168.0.1:bootps > 192.168.0.7:bootpc / BOOTP / DHCP
+  Ether / IP / UDP 192.168.0.1:bootps > 192.168.0.8:bootpc / BOOTP / DHCP
+
+Options:
+  -i TEXT     Interface to use
+  -t INTEGER  Time (seconds) to wait for responses
+  -s INTEGER  Time (seconds) between requests
+  -v          Verbose output
+  --help      Show this message and exit.
+
+
+//habu.dns.lookup.forward
+Usage: habu.dns.lookup.forward [OPTIONS] HOSTNAME
+
+  Perform a forward lookup of a given hostname.
+
+  Example:
+
+  $ habu.dns.lookup.forward google.com
+  {
+      "ipv4": "172.217.168.46",
+      "ipv6": "2a00:1450:400a:802::200e"
+  }
+
+Options:
+  -v      Verbose output
+  --help  Show this message and exit.
+
+
+//habu.dns.lookup.reverse
+Usage: habu.dns.lookup.reverse [OPTIONS] IP_ADDRESS
+
+  Perform a reverse lookup of a given IP address.
+
+  Example:
+
+  $ $ habu.dns.lookup.reverse 8.8.8.8
+  {
+      "hostname": "google-public-dns-a.google.com"
+  }
+
+Options:
+  -v      Verbose output
+  --help  Show this message and exit.
+
+
+//habu.eicar
+Usage: habu.eicar [OPTIONS]
+
+  Print the EICAR test string that can be used to test antimalware engines.
+
+  More info: http://www.eicar.org/86-0-Intended-use.html
+
+  Example:
+
+  $ habu.eicar
+  X5O!P%@AP[4\XZP54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*
+
+Options:
+  --help  Show this message and exit.
+
+
+//habu.forkbomb
+Usage: habu.forkbomb [OPTIONS] [bash|batch|c|haskell|perl|php|python|ruby]
+
+  A shortcut to remember how to use fork bombs in different languages.
+
+  Currently supported: bash, batch, c, haskell, perl, php, python, ruby.
+
+  Example:
+
+  $ habu.forkbomb c
+  #include <unistd.h>
+  int main()
+  {
+      while(1)
+      {
+          fork();
+      }
+      return 0;
+  }
+
+Options:
+  --help  Show this message and exit.
+
+
+//habu.fqdn.finder
+Usage: habu.fqdn.finder [OPTIONS] [DOMAINS]...
+
+  Uses various techniques to obtain valid FQDNs for the specified domains.
+
+  1. Try to all FQDNs with DNS zone transfers
+  2. Check for Certificate Transparency Logs
+  3. Connect to specified ports, obtain SSL certificates and get FQDNs from them
+  4. Connect to websites and get FQDNs based on the website links
+  5. DNS Brute Force for common names
+
+  The results are cleaned to remove FQDNs that does not resolve by DNS
+
+  Example:
+
+  $ habu.fqdn.finder educacionit.com
+  barometrosalarial.educacionit.com
+  blog.educacionit.com
+  ci.educacionit.com
+  educacionit.com
+  intranet.educacionit.com
+  lecdev.educacionit.com
+  lecweb.educacionit.com
+  mail.educacionit.com
+  plantillas.educacionit.com
+  www.educacionit.com
+
+Options:
+  -t FLOAT                  Time to wait for each connection
+  -v                        Verbose output
+  --debug                   Debug output
+  --connect / --no-connect  Get from known FQDNs open ports SSL certificates
+  --brute / --no-brute      Run DNS brute force against domains
+  --links / --no-links      Extract FQDNs from web site links
+  --xfr / --no-xfr          Try to do a DNS zone transfer against domains
+  --ctlog / --no-ctlog      Try to get FQDNs from Certificate Transparency
+                            Logs
+
+  --json                    Print the output in JSON format
+  --help                    Show this message and exit.
+
+
+//habu.gateway.find
+Usage: habu.gateway.find [OPTIONS] NETWORK
+
+  Try to reach an external IP using any host has a router.
+
+  Useful to find routers in your network.
+
+  First, uses arping to detect alive hosts and obtain MAC addresses.
+
+  Later, create a network packet and put each MAC address as destination.
+
+  Last, print the devices that forwarded correctly the packets.
+
+  Example:
+
+  # habu.find.gateway 192.168.0.0/24
+  192.168.0.1 a4:08:f5:19:17:a4 Sagemcom
+  192.168.0.7 b0:98:2b:5d:22:70 Sagemcom
+  192.168.0.8 b0:98:2b:5d:1f:e8 Sagemcom
+
+Options:
+  -i TEXT                Interface to use
+  --host TEXT            Host to reach (default: 8.8.8.8)
+  --tcp                  Use TCP instead of ICMP
+  --dport INTEGER RANGE  Destination port for TCP (default: 80)
+  --timeout INTEGER      Timeout in seconds (default: 5)
+  -v                     Verbose output
+  --help                 Show this message and exit.
+
+
+//habu.host
+Usage: habu.host [OPTIONS]
+
+  Collect information about the host where habu is running.
+
+  Example:
+
+  $ habu.host
+  {
+      "kernel": [
+          "Linux",
+          "demo123",
+          "5.0.6-200.fc29.x86_64",
+          "#1 SMP Wed Apr 3 15:09:51 UTC 2019",
+          "x86_64",
+          "x86_64"
+      ],
+      "distribution": [
+          "Fedora",
+          "29",
+          "Twenty Nine"
+      ],
+      "libc": [
+          "glibc",
+          "2.2.5"
+      ],
+      "arch": "x86_64",
+      "python_version": "3.7.3",
+      "os_name": "Linux",
+      "cpu": "x86_64",
+      "static_hostname": "demo123",
+      "fqdn": "demo123.lab.sierra"
+  }
+
+Options:
+  -v      Verbose output.
+  --help  Show this message and exit.
+
+
+//habu.http.headers
+Usage: habu.http.headers [OPTIONS] SERVER
+
+  Retrieve the HTTP headers of a web server.
+
+  Example:
+
+  $ habu.http.headers http://duckduckgo.com
+  {
+      "Server": "nginx",
+      "Date": "Sun, 14 Apr 2019 00:00:55 GMT",
+      "Content-Type": "text/html",
+      "Content-Length": "178",
+      "Connection": "keep-alive",
+      "Location": "https://duckduckgo.com/",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Content-Security-Policy": "default-src https: blob: data: 'unsafe-inline' 'unsafe-eval'",
+      "X-XSS-Protection": "1;mode=block",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "origin",
+      "Expect-CT": "max-age=0",
+      "Expires": "Mon, 13 Apr 2020 00:00:55 GMT",
+      "Cache-Control": "max-age=31536000"
+  }
+
+Options:
+  -v      Verbose output
+  --help  Show this message and exit.
+
+
+//habu.http.options
+Usage: habu.http.options [OPTIONS] SERVER
+
+  Retrieve the available HTTP methods of a web server.
+
+  Example:
+
+  $ habu.http.options -v http://google.com
+  {
+      "allowed": "GET, HEAD"
+  }
+
+Options:
+  -v      Verbose output
+  --help  Show this message and exit.
+
+
+//habu.http.tech
+Usage: habu.http.tech [OPTIONS] URL
+
+  Uses Wappalyzer apps.json database to identify technologies used on a web
+  application.
+
+  Reference: https://github.com/AliasIO/Wappalyzer
+
+  Note: This tool only sends one request. So, it's stealth and not
+  suspicious.
+
+  $ habu.web.tech https://woocomerce.com
+  Google Tag Manager       unknown
+  MySQL                    unknown
+  Nginx                    unknown
+  PHP                      unknown
+  Prototype                unknown
+  RequireJS                unknown
+  WooCommerce              3.8.0
+  WordPress                5.2.4
+  Yoast SEO                10.0.1
+
+Options:
+  --cache / --no-cache
+  --format [txt|csv|json]  Output format
+  -v                       Verbose output
+  --help                   Show this message and exit.
+
+
+//habu.icmp.ping
+Usage: habu.icmp.ping [OPTIONS] IP
+
+  The classic ping tool that send ICMP echo requests.
+
+  # habu.icmp.ping 8.8.8.8
+  IP / ICMP 8.8.8.8 > 192.168.0.5 echo-reply 0 / Padding
+  IP / ICMP 8.8.8.8 > 192.168.0.5 echo-reply 0 / Padding
+  IP / ICMP 8.8.8.8 > 192.168.0.5 echo-reply 0 / Padding
+  IP / ICMP 8.8.8.8 > 192.168.0.5 echo-reply 0 / Padding
+
+Options:
+  -i TEXT     Wich interface to use (default: auto)
+  -c INTEGER  How many packets send (default: infinit)
+  -t INTEGER  Timeout in seconds (default: 2)
+  -w INTEGER  How many seconds between packets (default: 1)
+  -v          Verbose
+  --help      Show this message and exit.
+
+
+//habu.ip.asn
+Usage: habu.ip.asn [OPTIONS] IP
+
+  Use Team Cymru ip2asn service to get information about a public IPv4/IPv6.
+
+  Reference: https://www.team-cymru.com/IP-ASN-mapping.html
+
+  $ habu.ip.asn 8.8.8.8
+  {
+      "asn": "15169",
+      "net": "8.8.8.0/24",
+      "cc": "US",
+      "rir": "ARIN",
+      "asname": "GOOGLE - Google LLC, US",
+      "country": "United States"
+  }
+
+Options:
+  --help  Show this message and exit.
+
+
+//habu.ip.geolocation
+Usage: habu.ip.geolocation [OPTIONS] IP_ADDRESS
+
+  Get the geolocation of an IP adddress from https://ipapi.co/.
+
+  Example:
+
+  $ habu.ip.geolocation 8.8.8.8
+  {
+      "ip": "8.8.8.8",
+      "city": "Mountain View",
+      ...
+      "asn": "AS15169",
+      "org": "Google LLC"
+  }
+
+Options:
+  -v      Verbose output.
+  --help  Show this message and exit.
+
+
+//habu.ip.internal
+Usage: habu.ip.internal [OPTIONS]
+
+  Get the local IP address(es) of the local interfaces.
+
+  Example:
+
+  $ habu.ip.internal
+  {
+    "lo": {
+      "ipv4": [
+        {
+          "addr": "127.0.0.1",
+          "netmask": "255.0.0.0",
+          "peer": "127.0.0.1"
+        }
+      ],
+      "link_layer": [
+        {
+          "addr": "00:00:00:00:00:00",
+          "peer": "00:00:00:00:00:00"
+        }
+      ],
+      "ipv6": [
+        {
+          "addr": "::1",
+          "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128"
+        }
+      ]
+    },
+  ...
+
+Options:
+  -v      Verbose output.
+  --help  Show this message and exit.
+
+
+//habu.ip.public
+Usage: habu.ip.public [OPTIONS]
+
+  Get the public IP address of the connection from https://api.ipify.org.
+
+  Example:
+
+  $ habu.ip.public
+  80.219.53.185
+
+Options:
+  -4, --ipv4  Print your pu
