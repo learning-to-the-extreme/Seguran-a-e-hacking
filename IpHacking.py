@@ -1013,6 +1013,164 @@ Usage: habu.ip.public [OPTIONS]
 
   $ habu.ip.public
   80.219.53.185
+    
+Options:
+  -4, --ipv4  Print your public IPv4 address (default)
+  -6, --ipv6  Print your public IPv6 address
+  -j, --json  Print the output in JSON format
+  --help      Show this message and exit.
+    
+    
+//habu.karma
+Usage: habu.karma [OPTIONS] HOST
+
+  Use the Karma service https://karma.securetia.com to check an IP against
+  various Threat Intelligence / Reputation lists.
+
+  $ habu.karma www.google.com
+  www.google.com -> 64.233.190.99
+  [
+      "hphosts_fsa",
+      "hphosts_psh",
+      "hphosts_emd"
+  ]
+
+  Note: You can use the hostname or the IP of the host to query.
 
 Options:
-  -4, --ipv4  Print your pu
+  --help  Show this message and exit.
+
+//habu.karma.bulk
+Usage: habu.karma.bulk [OPTIONS] [INFILE]
+
+  Show which IP addresses are inside blacklists using the Karma online
+  service.
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.extract.ipv4 | habu.karma.bulk
+  172.217.162.4   spamhaus_drop,alienvault_spamming
+  23.52.213.96    CLEAN
+  190.210.43.70   alienvault_malicious
+
+Options:
+  --json  JSON output
+  --bad   Show only entries in blacklists
+  -v      Verbose output
+  --help  Show this message and exit.
+
+    
+    
+
+//habu.land
+Usage: habu.land [OPTIONS] IP
+
+  This command implements the LAND attack, that sends packets forging the
+  source IP address to be the same that the destination IP. Also uses the
+  same source and destination port.
+
+  The attack is very old, and can be used to make a Denial of Service on old
+  systems, like Windows NT 4.0. More information here:
+  https://en.wikipedia.org/wiki/LAND
+
+  # sudo habu.land 172.16.0.10
+  ............
+
+  Note: Each dot (.) is a sent packet. You can specify how many packets send
+  with the '-c' option. The default is never stop. Also, you can specify the
+  destination port, with the '-p' option.
+
+Options:
+  -c INTEGER  How many packets send (default: infinit)
+  -p INTEGER  Port to use (default: 135)
+  -i TEXT     Interface to use
+  -v          Verbose
+  --help      Show this message and exit.
+
+
+//habu.nc
+Usage: habu.nc [OPTIONS] HOST PORT
+
+  Some kind of netcat/ncat replacement.
+
+  The execution emulates the feeling of this popular tools.
+
+  Example:
+
+  $ habu.nc --crlf www.portantier.com 80
+  Connected to 45.77.113.133 80
+  HEAD / HTTP/1.0
+
+  HTTP/1.0 301 Moved Permanently
+  Date: Thu, 26 Jul 2018 21:10:51 GMT
+  Server: OpenBSD httpd
+  Connection: close
+  Content-Type: text/html
+  Content-Length: 443
+  Location: https://www.portantier.com/
+
+Options:
+  --family [4|6|46]            IP Address Family
+  --ssl                        Enable SSL
+  --crlf                       Use CRLF for EOL sequence
+  --protocol [tcp|udp]         Layer 4 protocol to use
+  --source-ip TEXT             Source IP to use
+  --source-port INTEGER RANGE  Source port to use
+  --help                       Show this message and exit.
+
+//habu.net.contest
+Usage: habu.net.contest [OPTIONS]
+
+  Try to connect to various services and check if can reach them using your
+  internet connection.
+
+  Example:
+
+  $ habu.net.contest
+  DNS:   True
+  FTP:   True
+  SSH:   True
+  HTTP:  True
+  HTTPS: True
+
+Options:
+  --help  Show this message and exit.
+    
+    
+//habu.net.interfaces
+Usage: habu.net.interfaces [OPTIONS]
+
+  Show the network interfaces available on the system.
+
+  Example:
+
+  # habu.interfaces
+  #  NAME                            MAC                INET             INET6
+  0  eth0                            80:fa:5b:4b:f9:18  None             None
+  1  lo                              00:00:00:00:00:00  127.0.0.1        ::1
+  2  wlan0                           f4:96:34:e5:ae:1b  192.168.0.6      None
+  3  vboxnet0                        0a:00:27:00:00:00  192.168.56.1     fe80::800:27ff:fe00:0
+
+Options:
+  -j      Output in JSON format
+  --help  Show this message and exit.
+    
+    
+  //habu.nmap.excluded
+Usage: habu.nmap.excluded [OPTIONS]
+
+  Prints a random port that is not present on nmap-services file so is not
+  scanned automatically by nmap.
+
+  Useful for services like SSH or RDP, that are continuously scanned on
+  their default ports.
+
+  Example:
+
+  # habu.nmap.excluded
+  58567
+
+Options:
+  -l INTEGER RANGE  Lowest port to consider
+  -h INTEGER RANGE  Highest port to consider
+  --help            Show this message and exit.
