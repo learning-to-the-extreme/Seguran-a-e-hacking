@@ -1174,3 +1174,83 @@ Options:
   -l INTEGER RANGE  Lowest port to consider
   -h INTEGER RANGE  Highest port to consider
   --help            Show this message and exit.
+
+
+//habu.nmap.open
+Usage: habu.nmap.open [OPTIONS] SCANFILE
+
+  Read an nmap report and print the open ports.
+
+  Print the ports that has been resulted open reading the generated nmap
+  output.
+
+  You can use it to rapidly reutilize the port list for the input of other
+  tools.
+
+  Supports and detects the 3 output formats (nmap, gnmap and xml)
+
+  Example:
+
+  # habu.nmap.open portantier.nmap
+  22,80,443
+
+Options:
+  -p [tcp|udp|sctp]  The protocol (default=tcp)
+  --help             Show this message and exit.
+
+//habu.nmap.ports
+Usage: habu.nmap.ports [OPTIONS] SCANFILE
+
+  Read an nmap report and print the tested ports.
+
+  Print the ports that has been tested reading the generated nmap output.
+
+  You can use it to rapidly reutilize the port list for the input of other
+  tools.
+
+  Supports and detects the 3 output formats (nmap, gnmap and xml)
+
+  Example:
+
+  # habu.nmap.ports portantier.nmap
+  21,22,23,80,443
+
+Options:
+  -p [tcp|udp|sctp]  The protocol (default=tcp)
+  --help             Show this message and exit.
+
+    
+//habu.protoscan
+Usage: habu.protoscan [OPTIONS] IP
+
+  Send IP packets with different protocol field content to guess what layer
+  4 protocols are available.
+
+  The output shows which protocols doesn't generate a 'protocol-unreachable'
+  ICMP response.
+
+  Example:
+
+  $ sudo python cmd_ipscan.py 45.77.113.133
+  1   icmp
+  2   igmp
+  4   ipencap
+  6   tcp
+  17  udp
+  41  ipv6
+  47  gre
+  50  esp
+  51  ah
+  58  ipv6_icmp
+  97  etherip
+  112 vrrp
+  115 l2tp
+  132 sctp
+  137 mpls_in_ip
+
+Options:
+  -i TEXT     Interface to use
+  -t INTEGER  Timeout for each probe (default: 2 seconds)
+  --all       Probe all protocols (default: Defined in /etc/protocols)
+  -v          Verbose output
+  --help      Show this message and exit.
