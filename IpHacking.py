@@ -339,4 +339,244 @@ Options:
   --ttl INTEGER  Time To Live for timestamp verification
   -i FILENAME    Input file (default: stdin)
   -o FILENAME    Output file (default: stdout)
-  --help         Show 
+  --help         Show this message and exit.
+
+
+//habu.crypto.fernet.genkey
+Usage: habu.crypto.fernet.genkey [OPTIONS]
+
+  Generate a new Fernet Key, optionally write it to ~/.habu.json
+
+  Example:
+
+  $ habu.crypto.fernet.genkey
+  xgvWCIvjwe9Uq7NBvwO796iI4dsGD623QOT9GWqnuhg=
+
+Options:
+  -w      Write this key to ~/.habu.json
+  --help  Show this message and exit.
+
+
+//habu.crypto.gppref
+Usage: habu.crypto.gppref [OPTIONS] PASSWORD
+
+  Decrypt the password of local users added via Windows 2008 Group Policy
+  Preferences.
+
+  This value is the 'cpassword' attribute embedded in the Groups.xml file,
+  stored in the domain controller's Sysvol share.
+
+  Example:
+
+  # habu.crypto.gppref AzVJmXh/J9KrU5n0czX1uBPLSUjzFE8j7dOltPD8tLk
+  testpassword
+
+Options:
+  --help  Show this message and exit.
+
+
+//habu.crypto.hasher
+Usage: habu.crypto.hasher [OPTIONS] [F]
+
+  Compute various hashes for the input data, that can be a file or a stream.
+
+  Example:
+
+  $ habu.crypto.hasher README.rst
+  md5          992a833cd162047daaa6a236b8ac15ae README.rst
+  ripemd160    0566f9141e65e57cae93e0e3b70d1d8c2ccb0623 README.rst
+  sha1         d7dbfd2c5e2828eb22f776550c826e4166526253 README.rst
+  sha256       6bb22d927e1b6307ced616821a1877b6cc35e... README.rst
+  sha512       8743f3eb12a11cf3edcc16e400fb14d599b4a... README.rst
+  whirlpool    96bcc083242e796992c0f3462f330811f9e8c... README.rst
+
+  You can also specify which algorithm to use. In such case, the output is
+  only the value of the calculated hash:
+
+  $ habu.hasher -a md5 README.rst
+  992a833cd162047daaa6a236b8ac15ae README.rst
+
+Options:
+  -a [md5|sha1|sha256|sha512|ripemd160|whirlpool]
+                                  Only this algorithm (Default: all)
+  --help                          Show this message and exit.
+
+
+//habu.crypto.xor
+Usage: habu.crypto.xor [OPTIONS]
+
+  XOR cipher.
+
+  Note: XOR is not a 'secure cipher'. If you need strong crypto you must use
+  algorithms like AES. You can use habu.fernet for that.
+
+  Example:
+
+  $ habu.xor -k mysecretkey -i /bin/ls > xored
+  $ habu.xor -k mysecretkey -i xored > uxored
+  $ sha1sum /bin/ls uxored
+  $ 6fcf930fcee1395a1c95f87dd38413e02deff4bb  /bin/ls
+  $ 6fcf930fcee1395a1c95f87dd38413e02deff4bb  uxored
+
+Options:
+  -k TEXT      Encryption key
+  -i FILENAME  Input file (default: stdin)
+  -o FILENAME  Output file (default: stdout)
+  --help       Show this message and exit.
+
+
+//habu.data.enrich
+Usage: habu.data.enrich [OPTIONS]
+
+  Enrich data adding interesting information.
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.data.extract.ipv4 | habu.data.enrich
+  [
+      {
+          "asset": "8.8.8.8",
+          "family": "IPAddress",
+          "asn": "15169",
+          "net": "8.8.8.0/24",
+          "cc": "US",
+          "rir": "ARIN",
+          "asname": "GOOGLE - Google LLC, US"
+      },
+      {
+          "asset": "8.8.4.4",
+          "family": "IPAddress",
+          "asn": "15169",
+          "net": "8.8.4.0/24",
+          "cc": "US",
+          "rir": "ARIN",
+          "asname": "GOOGLE - Google LLC, US"
+      }
+  ]
+
+Options:
+  -i FILENAME  Input file (Default: stdin)
+  -v           Verbose output
+  --help       Show this message and exit.
+
+
+//habu.data.extract.domain
+Usage: habu.data.extract.domain [OPTIONS] [INFILE]
+
+  Extract valid domains from a file or stdin.
+
+  Optionally, check each domain for the presence of NS registers.
+
+  Example:
+
+  $ cat /var/log/some.log | habu.data.extract.domain -c
+  google.com
+  ibm.com
+  redhat.com
+
+Options:
+  -c      Check if domain has NS servers defined
+  -v      Verbose output
+  -j      JSON output
+  --help  Show this message and exit.
+
+
+//habu.data.extract.email
+Usage: habu.data.extract.email [OPTIONS] [INFILE]
+
+  Extract email addresses from a file or stdin.
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.data.extract.email
+  john@securetia.com
+  raven@acmecorp.net
+  nmarks@fimax.com
+
+Options:
+  -v      Verbose output
+  -j      JSON output
+  --help  Show this message and exit.
+
+
+//habu.data.extract.fqdn
+Usage: habu.data.extract.fqdn [OPTIONS] [INFILE]
+
+  Extract FQDNs (Fully Qualified Domain Names) from a file or stdin.
+
+  Example:
+
+  $ cat /var/log/some.log | habu.data.extract.fqdn
+  www.google.com
+  ibm.com
+  fileserver.redhat.com
+
+Options:
+  -c      Check if hostname resolves
+  -v      Verbose output
+  -j      JSON output
+  --help  Show this message and exit.
+
+
+//habu.data.extract.ipv4
+Usage: habu.data.extract.ipv4 [OPTIONS] [INFILE]
+
+  Extract IPv4 addresses from a file or stdin.
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.data.extract.ipv4
+  172.217.162.4
+  23.52.213.96
+  190.210.43.70
+
+Options:
+  -j, --json    JSON output
+  -u, --unique  Remove duplicates
+  -v            Verbose output
+  --help        Show this message and exit.
+
+
+//habu.data.filter
+Usage: habu.data.filter [OPTIONS] FIELD [gt|lt|eq|ne|ge|le|in|contains|defin
+                          ed|undefined|true|false] [VALUE]
+
+  Filter data based on operators.
+
+  Operator Reference:
+
+  gt:         Greater than
+  lt:         Lesser than
+  eq:         Equal to
+  ne:         Not equal to
+  ge:         Greather or equal than
+  le:         Lesser or equal than
+  in:         Inside the list of values (or inside the network)
+  contains:   Contains the value (or the network address)
+  defined:    The value is defined
+  undefined:  The value is not defined
+  true:       The value is True
+  false:      The value is False
+
+  Example:
+
+  $ cat /var/log/auth.log | habu.data.extract.ipv4 | habu.data.enrich | habu.data.filter cc eq US
+  [
+      {
+          "item": "8.8.8.8",
+          "family": "ipv4_address",
+          "asn": "15169",
+          "net": "8.8.8.0/24",
+          "cc": "US",
+          "rir": "ARIN",
+          "asname":  "GOOGLE - Google LLC, US"
+      }
+  ]
+
+  Docs: https://fportantier.github.io/hacking-with-habu/user/data-manipulation.html#data-enrichment
+
+Options:
+  -i FILENAME  Input file (Default: stdin)
+  -v           Verbose output
+  --not        Negate the comparison
+  --help       Show this message and exit.
